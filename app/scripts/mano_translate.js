@@ -16,16 +16,27 @@ class ManoTranslator {
                     const text = await pFileReader(file);
 
                     parseString(text, (err, result) => {
-                        let map = {};
+                        let decodeMap = {};
+                        let encodeMap = {};
                         result["ArrayOfSerial"]["Serial"].forEach(elm => {
-                            map[elm["value"]] = elm["key"];
+                            decodeMap[elm["value"]] = elm["key"];
+                            encodeMap[elm["key"]] = elm["value"];
                         });
-                        this.decodeMap = map;
-                        console.log(this.decodeMap);
+                        this.decodeMap = decodeMap;
+                        this.encodeMap = encodeMap;
                     });
                 });
             }, (sample) => console.log("error"));
         });
+    }
+
+    encode(str) {
+        const map = Array.prototype.map;
+        const ret = map.call(str, x => {
+            const c = x.charCodeAt(0);
+            return this.encodeMap[c] || x;
+        }).reduce((a, b) => a + b);
+        return ret;
     }
 
     decode(str) {

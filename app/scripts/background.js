@@ -14,3 +14,41 @@ chrome.contextMenus.create({
     alert(decodedText);
   }
 });
+
+chrome.runtime.onMessage.addListener(
+  (request, sender, sendResponse) => {
+    if (request.name === "manoTranslateDecode") {
+      sendResponse(manoTranslate.decode(request.text));
+    } else if (request.name === "manoTranslateEncode") {
+      sendResponse(manoTranslate.encode(request.text));
+    } else {
+      sendMessage({});
+    }
+  }
+);
+
+function createEditTextContextMenu(name) {
+  chrome.contextMenus.create({
+    title: name,
+    contexts: ["editable"],
+    onclick: (info, tabs) => {
+      var queryInfo = {
+        active: true,
+        windowId: chrome.windows.WINDOW_ID_CURRENT
+      };
+
+      chrome.tabs.query(queryInfo, function (result) {
+        let tab = result.shift();
+        chrome.tabs.sendMessage(tab.id, { name: "text" + name }, function (response) {
+          if (response === undefined) {
+            console.log(chrome.runtime.lastError);
+            return;
+          }
+        });
+      });
+    }
+  });
+}
+
+createEditTextContextMenu("Encode");
+createEditTextContextMenu("Decode");
