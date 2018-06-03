@@ -27,28 +27,42 @@ chrome.runtime.onMessage.addListener(
   }
 );
 
+function tabQuerySendMessage(sendName) {
+  var queryInfo = {
+    active: true,
+    windowId: chrome.windows.WINDOW_ID_CURRENT
+  };
+
+  chrome.tabs.query(queryInfo, function (result) {
+    let tab = result.shift();
+    chrome.tabs.sendMessage(tab.id, { name: sendName }, function (response) {
+      if (response === undefined) {
+        console.log(chrome.runtime.lastError);
+        return;
+      }
+    });
+  });
+}
 function createEditTextContextMenu(name) {
   chrome.contextMenus.create({
     title: name,
     contexts: ["editable"],
     onclick: (info, tabs) => {
-      var queryInfo = {
-        active: true,
-        windowId: chrome.windows.WINDOW_ID_CURRENT
-      };
-
-      chrome.tabs.query(queryInfo, function (result) {
-        let tab = result.shift();
-        chrome.tabs.sendMessage(tab.id, { name: "text" + name }, function (response) {
-          if (response === undefined) {
-            console.log(chrome.runtime.lastError);
-            return;
-          }
-        });
-      });
+      tabQuerySendMessage("text" + name);
     }
   });
 }
 
 createEditTextContextMenu("Encode");
 createEditTextContextMenu("Decode");
+
+chrome.commands.onCommand.addListener(commandName => {
+  console.log(commandName);
+  if (commandName === "encode") {
+    tabQuerySendMessage("textEncode");
+  } else if (commandName === "decode") {
+    tabQuerySendMessage("textDecode");
+  } else {
+    console.error("unknown command name: " + commandName);
+  }
+});

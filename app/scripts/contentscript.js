@@ -27,6 +27,10 @@ function manoTranslateEncode(text) {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.name == "textDecode") {
         let current = document.activeElement;
+        if (typeof current.value !== typeof 'str') {
+            sendResponse({ responseText: "" });
+            return;
+        }
         manoTranslateDecode(current.value).then((response) => {
             current.value = response;
             sendResponse({ responseText: response });
@@ -34,6 +38,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return true;
     } else if (request.name == "textEncode") {
         let current = document.activeElement;
+        if (typeof current.value !== typeof 'str') {
+            sendResponse({ responseText: "" });
+            return;
+        }
         manoTranslateEncode(current.value).then((response) => {
             current.value = response;
             sendResponse({ responseText: response });

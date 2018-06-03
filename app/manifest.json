@@ -16,6 +16,20 @@
     "contextMenus",
     "tabs"
   ],
+  "commands": {
+    "encode": {
+      "suggested_key": {
+        "default": "Alt+H"
+      },
+      "description": "encode mano string"
+    },
+    "decode": {
+      "suggested_key": {
+        "default": "Alt+M"
+      },
+      "description": "decode mano string"
+    }
+  },
   "background": {
     "scripts": [
       "scripts/background.js"
